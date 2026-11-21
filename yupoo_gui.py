@@ -47,6 +47,7 @@ class App:
                                   (3, '保存目录', self.folder)):
             self.label(settings, title, bold=True).grid(row=row, column=0, sticky='w', padx=(0, 13), pady=4)
             entry = ttk.Entry(settings, textvariable=value)
+            self.add_paste_menu(entry)
             entry.grid(row=row, column=1, columnspan=1 if row == 3 else 2, sticky='ew', pady=4, ipady=3)
             if row == 0:
                 entry.focus_set()
@@ -119,6 +120,21 @@ class App:
 
     def sync_width(self):
         self.width_field.configure(state='normal' if self.mode.get() == 'width' else 'disabled')
+
+    @staticmethod
+    def add_paste_menu(entry):
+        menu = tk.Menu(entry, tearoff=False)
+        menu.add_command(label='粘贴', command=lambda: entry.event_generate('<<Paste>>'))
+
+        def show_menu(event):
+            entry.focus_set()
+            try:
+                menu.tk_popup(event.x_root, event.y_root)
+            finally:
+                menu.grab_release()
+            return 'break'
+
+        entry.bind('<Button-3>', show_menu)
 
     def choose_folder(self):
         path = filedialog.askdirectory(parent=self.root)
